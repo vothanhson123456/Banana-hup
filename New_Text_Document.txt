@@ -1,0 +1,171 @@
+-- Tạo giao diện UI (Menu)
+local player = game.Players.LocalPlayer
+local screenGui = Instance.new("ScreenGui")
+screenGui.Parent = player:WaitForChild("PlayerGui")
+
+-- Tạo Frame chính chứa menu
+local menuFrame = Instance.new("Frame")
+menuFrame.Size = UDim2.new(0, 400, 0, 300)
+menuFrame.Position = UDim2.new(0.5, -200, 0.5, -150)
+menuFrame.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
+menuFrame.BorderSizePixel = 0
+menuFrame.Parent = screenGui
+
+-- Tiêu đề Menu
+local titleLabel = Instance.new("TextLabel")
+titleLabel.Size = UDim2.new(0, 400, 0, 50)
+titleLabel.Position = UDim2.new(0, 0, 0, 0)
+titleLabel.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+titleLabel.Text = "Blox Fruits Auto Menu"
+titleLabel.TextSize = 24
+titleLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+titleLabel.TextAlign = Enum.TextAlign.Center
+titleLabel.Parent = menuFrame
+
+-- Nút Tự động chiến đấu
+local autoFightButton = Instance.new("TextButton")
+autoFightButton.Size = UDim2.new(0, 380, 0, 40)
+autoFightButton.Position = UDim2.new(0, 10, 0, 60)
+autoFightButton.Text = "Bắt đầu tự động chiến đấu"
+autoFightButton.TextSize = 18
+autoFightButton.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
+autoFightButton.Parent = menuFrame
+
+-- Nút Tự động thu thập trái cây
+local autoCollectButton = Instance.new("TextButton")
+autoCollectButton.Size = UDim2.new(0, 380, 0, 40)
+autoCollectButton.Position = UDim2.new(0, 10, 0, 110)
+autoCollectButton.Text = "Bắt đầu tự động thu thập trái cây"
+autoCollectButton.TextSize = 18
+autoCollectButton.BackgroundColor3 = Color3.fromRGB(0, 255, 0)
+autoCollectButton.Parent = menuFrame
+
+-- Nút Tự động làm nhiệm vụ
+local autoQuestButton = Instance.new("TextButton")
+autoQuestButton.Size = UDim2.new(0, 380, 0, 40)
+autoQuestButton.Position = UDim2.new(0, 10, 0, 160)
+autoQuestButton.Text = "Bắt đầu tự động làm nhiệm vụ"
+autoQuestButton.TextSize = 18
+autoQuestButton.BackgroundColor3 = Color3.fromRGB(0, 0, 255)
+autoQuestButton.Parent = menuFrame
+
+-- Nút Dừng tất cả các hành động
+local stopButton = Instance.new("TextButton")
+stopButton.Size = UDim2.new(0, 380, 0, 40)
+stopButton.Position = UDim2.new(0, 10, 0, 210)
+stopButton.Text = "Dừng tất cả hành động"
+stopButton.TextSize = 18
+stopButton.BackgroundColor3 = Color3.fromRGB(255, 165, 0)
+stopButton.Parent = menuFrame
+
+-- Hàm tự động nhận nhiệm vụ
+local function autoAcceptQuest()
+    print("Đang tự động nhận nhiệm vụ...")
+    local questGiver = workspace:FindFirstChild("QuestGiver") -- Tìm NPC nhận nhiệm vụ
+    if questGiver then
+        -- Di chuyển đến QuestGiver và nhận nhiệm vụ
+        player.Character:MoveTo(questGiver.Position)
+        -- Giả lập nhấn nhận nhiệm vụ
+        firetouchinterest(player.Character.HumanoidRootPart, questGiver, 0)
+    end
+end
+
+-- Hàm tự động nâng cấp cấp độ
+local function autoLevelUp()
+    print("Đang tự động nâng cấp cấp độ...")
+    -- Thực hiện nâng cấp cấp độ bằng cách chiến đấu hoặc hoàn thành nhiệm vụ
+    -- Ví dụ, bạn có thể tự động chiến đấu với quái vật gần nhất
+    while true do
+        -- Tìm và chiến đấu với quái vật gần nhất
+        local enemy = workspace:FindFirstChild("Enemy")
+        if enemy then
+            player.Character:MoveTo(enemy.Position)
+            firetouchinterest(player.Character.HumanoidRootPart, enemy, 0)
+        end
+        wait(1)
+    end
+end
+
+-- Hàm tự động thu thập trái cây và cất trái cây
+local function autoCollectFruits()
+    print("Đang tự động thu thập trái cây...")
+    local function findClosestFruit()
+        local closestFruit = nil
+        local shortestDistance = math.huge
+        for _, item in pairs(workspace.Items:GetChildren()) do
+            if item.Name == "Fruit" then
+                local distance = (item.Position - player.Character.HumanoidRootPart.Position).Magnitude
+                if distance < shortestDistance then
+                    shortestDistance = distance
+                    closestFruit = item
+                end
+            end
+        end
+        return closestFruit
+    end
+
+    while true do
+        local closestFruit = findClosestFruit()
+        if closestFruit then
+            player.Character:MoveTo(closestFruit.Position)
+            firetouchinterest(player.Character.HumanoidRootPart, closestFruit, 0)
+            -- Cất trái cây nếu chưa có
+            if not player.Backpack:FindFirstChild(closestFruit.Name) then
+                -- Giả lập cất trái cây vào kho
+            end
+        end
+        wait(1)
+    end
+end
+
+-- Hàm tự động lấy tất cả items và kiếm súng
+local function autoCollectItems()
+    print("Đang tự động lấy tất cả items và kiếm súng...")
+    local function collectAllItems()
+        for _, item in pairs(workspace.Items:GetChildren()) do
+            if item:IsA("Tool") then
+                player.Character:MoveTo(item.Position)
+                firetouchinterest(player.Character.HumanoidRootPart, item, 0)
+            end
+        end
+    end
+
+    while true do
+        collectAllItems()
+        wait(2)
+    end
+end
+
+-- Hàm tự động làm nhiệm vụ để qua sea mới
+local function autoQuestForNewSea()
+    print("Đang tự động làm nhiệm vụ để qua sea mới...")
+    -- Thực hiện tự động làm nhiệm vụ
+    -- Bạn có thể thêm logic để nhận và hoàn thành nhiệm vụ từ NPC
+end
+
+-- Sự kiện nhấn nút Tự động chiến đấu
+autoFightButton.MouseButton1Click:Connect(function()
+    autoFightButton.Text = "Đang chiến đấu..."
+    autoFightButton.BackgroundColor3 = Color3.fromRGB(200, 0, 0)
+    autoLevelUp()
+end)
+
+-- Sự kiện nhấn nút Tự động thu thập trái cây
+autoCollectButton.MouseButton1Click:Connect(function()
+    autoCollectButton.Text = "Đang thu thập trái cây..."
+    autoCollectButton.BackgroundColor3 = Color3.fromRGB(0, 200, 0)
+    autoCollectFruits()
+end)
+
+-- Sự kiện nhấn nút Tự động làm nhiệm vụ
+autoQuestButton.MouseButton1Click:Connect(function()
+    autoQuestButton.Text = "Đang làm nhiệm vụ..."
+    autoQuestButton.BackgroundColor3 = Color3.fromRGB(0, 0, 200)
+    autoAcceptQuest()
+end)
+
+-- Sự kiện nhấn nút Dừng tất cả hành động
+stopButton.MouseButton1Click:Connect(function()
+    print("Dừng tất cả hành động.")
+    -- Đoạn này có thể thêm chức năng dừng các hành động đang chạy
+end)
